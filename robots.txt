@@ -1,0 +1,41 @@
+# Robots.txt for Procurement Management System
+
+User-agent: *
+
+# Allow public pages
+Allow: /
+Allow: /index.php
+Allow: /tender-details.php
+Allow: /all-tenders.php
+Allow: /style.css
+
+# Block admin areas
+Disallow: /admin/
+Disallow: /config/
+Disallow: /uploads/
+
+# Block sensitive files
+Disallow: *.sql
+Disallow: *.log
+Disallow: *.env
+Disallow: *.ini
+Disallow: *.conf
+Disallow: *.bak
+Disallow: *.backup
+
+# Block version control
+Disallow: /.git/
+Disallow: /.gitignore
+Disallow: /.svn/
+Disallow: /.hg/
+
+# Block temporary files
+Disallow: /tmp/
+Disallow: /temp/
+Disallow: *.tmp
+
+# Sitemap location (create sitemap.xml if needed)
+Sitemap: https://yourdomain.com/sitemap.xml
+
+# Crawl delay (optional - adjust as needed)
+Crawl-delay: 1

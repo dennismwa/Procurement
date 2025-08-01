@@ -1,0 +1,245 @@
+# Main .htaccess for Procurement Management System
+# Place this file in the root directory of your website
+
+# Enable URL Rewriting
+RewriteEngine On
+
+# Security Headers
+<IfModule mod_headers.c>
+    # Prevent clickjacking
+    Header always set X-Frame-Options DENY
+    
+    # Prevent MIME type sniffing
+    Header always set X-Content-Type-Options nosniff
+    
+    # Enable XSS protection
+    Header always set X-XSS-Protection "1; mode=block"
+    
+    # Referrer policy
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    
+    # Content Security Policy (adjust as needed)
+    Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'"
+</IfModule>
+
+# Hide sensitive files and directories
+<Files ~ "^\.">
+    Order allow,deny
+    Deny from all
+</Files>
+
+# Protect configuration files
+<FilesMatch "\.(env|ini|log|sh|sql|conf|bak|backup)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Protect PHP configuration
+<Files "config.php">
+    Order allow,deny
+    Deny from all
+</Files>
+
+<Files "database.php">
+    Order allow,deny
+    Deny from all
+</Files>
+
+# Block access to setup and readme files
+<FilesMatch "(setup|install|readme|changelog|license)\.(php|txt|md)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# PHP Security Settings
+<IfModule mod_php7.c>
+    # Hide PHP version
+    php_flag expose_php Off
+    
+    # File upload settings
+    php_value upload_max_filesize 20M
+    php_value post_max_size 25M
+    php_value max_execution_time 300
+    php_value max_input_time 300
+    php_value memory_limit 256M
+    
+    # Session security
+    php_value session.cookie_httponly 1
+    php_value session.cookie_secure 1
+    php_value session.use_strict_mode 1
+    
+    # Disable dangerous functions
+    php_value disable_functions "exec,passthru,shell_exec,system,proc_open,popen,curl_exec,curl_multi_exec,parse_ini_file,show_source"
+</IfModule>
+
+<IfModule mod_php8.c>
+    # Hide PHP version
+    php_flag expose_php Off
+    
+    # File upload settings
+    php_value upload_max_filesize 20M
+    php_value post_max_size 25M
+    php_value max_execution_time 300
+    php_value max_input_time 300
+    php_value memory_limit 256M
+    
+    # Session security
+    php_value session.cookie_httponly 1
+    php_value session.cookie_secure 1
+    php_value session.use_strict_mode 1
+    
+    # Disable dangerous functions
+    php_value disable_functions "exec,passthru,shell_exec,system,proc_open,popen,curl_exec,curl_multi_exec,parse_ini_file,show_source"
+</IfModule>
+
+# URL Rewriting Rules
+RewriteEngine On
+
+# Force HTTPS (uncomment if you have SSL certificate)
+# RewriteCond %{HTTPS} off
+# RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Remove www (optional - uncomment if you prefer non-www)
+# RewriteCond %{HTTP_HOST} ^www\.(.*)$ [NC]
+# RewriteRule ^(.*)$ https://%1/$1 [R=301,L]
+
+# Clean URLs for tender details
+RewriteRule ^tender/([0-9]+)/?$ tender-details.php?id=$1 [L,QSA]
+
+# Clean URLs for admin sections
+RewriteRule ^admin/?$ admin/admin.php [L]
+RewriteRule ^admin/login/?$ admin/admin.php [L]
+RewriteRule ^admin/dashboard/?$ admin/dashboard.php [L]
+RewriteRule ^admin/tenders/?$ admin/tenders.php [L]
+RewriteRule ^admin/projects/?$ admin/projects.php [L]
+RewriteRule ^admin/reports/?$ admin/reports.php [L]
+
+# Clean URL for all tenders page
+RewriteRule ^tenders/?$ all-tenders.php [L,QSA]
+
+# Default document (optional)
+DirectoryIndex index.php index.html
+
+# Compress files for better performance
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/plain
+    AddOutputFilterByType DEFLATE text/html
+    AddOutputFilterByType DEFLATE text/xml
+    AddOutputFilterByType DEFLATE text/css
+    AddOutputFilterByType DEFLATE application/xml
+    AddOutputFilterByType DEFLATE application/xhtml+xml
+    AddOutputFilterByType DEFLATE application/rss+xml
+    AddOutputFilterByType DEFLATE application/javascript
+    AddOutputFilterByType DEFLATE application/x-javascript
+</IfModule>
+
+# Browser Caching
+<IfModule mod_expires.c>
+    ExpiresActive On
+    
+    # Images
+    ExpiresByType image/jpg "access plus 1 month"
+    ExpiresByType image/jpeg "access plus 1 month"
+    ExpiresByType image/gif "access plus 1 month"
+    ExpiresByType image/png "access plus 1 month"
+    ExpiresByType image/svg+xml "access plus 1 month"
+    ExpiresByType image/x-icon "access plus 1 year"
+    
+    # CSS and JavaScript
+    ExpiresByType text/css "access plus 1 month"
+    ExpiresByType application/javascript "access plus 1 month"
+    ExpiresByType application/x-javascript "access plus 1 month"
+    
+    # Documents
+    ExpiresByType application/pdf "access plus 1 month"
+    ExpiresByType application/msword "access plus 1 month"
+    ExpiresByType application/vnd.ms-excel "access plus 1 month"
+    
+    # HTML (shorter cache for dynamic content)
+    ExpiresByType text/html "access plus 1 hour"
+    ExpiresByType application/xhtml+xml "access plus 1 hour"
+</IfModule>
+
+# Set Cache-Control headers
+<IfModule mod_headers.c>
+    # CSS and JavaScript
+    <FilesMatch "\.(css|js)$">
+        Header set Cache-Control "public, max-age=2592000"
+    </FilesMatch>
+    
+    # Images
+    <FilesMatch "\.(jpg|jpeg|png|gif|svg|ico)$">
+        Header set Cache-Control "public, max-age=2592000"
+    </FilesMatch>
+    
+    # Documents
+    <FilesMatch "\.(pdf|doc|docx|xls|xlsx)$">
+        Header set Cache-Control "public, max-age=86400"
+        Header set Content-Disposition "attachment"
+    </FilesMatch>
+    
+    # HTML files (dynamic content)
+    <FilesMatch "\.(html|php)$">
+        Header set Cache-Control "no-cache, must-revalidate"
+    </FilesMatch>
+</IfModule>
+
+# Prevent hotlinking of images (optional)
+# RewriteCond %{HTTP_REFERER} !^$
+# RewriteCond %{HTTP_REFERER} !^https?://(www\.)?yourdomain\.com [NC]
+# RewriteRule \.(jpg|jpeg|png|gif)$ - [F]
+
+# Custom Error Pages (create these files if you want custom error pages)
+ErrorDocument 404 /404.html
+ErrorDocument 403 /403.html
+ErrorDocument 500 /500.html
+
+# Block suspicious user agents
+<IfModule mod_rewrite.c>
+    RewriteCond %{HTTP_USER_AGENT} ^$ [OR]
+    RewriteCond %{HTTP_USER_AGENT} ^(-|\.|') [OR]
+    RewriteCond %{HTTP_USER_AGENT} ^(.*)(<|>|%0A|%0D|%27|%3C|%3E|%00).* [NC,OR]
+    RewriteCond %{HTTP_USER_AGENT} ^(java|curl|wget).* [NC,OR]
+    RewriteCond %{HTTP_USER_AGENT} ^.*(libwww-perl|curl|wget|python|nikto|wkito|pikto|scan|acunetix).* [NC,OR]
+    RewriteCond %{HTTP_USER_AGENT} ^.*(<|%0A|%0D|%27|%3C|%3E|%00).* [NC]
+    RewriteRule .* - [F,L]
+</IfModule>
+
+# Block common exploit attempts
+<IfModule mod_rewrite.c>
+    # Block query strings with suspicious content
+    RewriteCond %{QUERY_STRING} ^.*(<|%3C).*script.*(>|%3E).* [NC,OR]
+    RewriteCond %{QUERY_STRING} ^.*(<|%3C).*iframe.*(>|%3E).* [NC,OR]
+    RewriteCond %{QUERY_STRING} ^.*(<|%3C).*object.*(>|%3E).* [NC,OR]
+    RewriteCond %{QUERY_STRING} ^.*(;|<|>|'|"|\)|%0A|%0D|%22|%27|%3C|%3E|%00).*(/\*|union|select|insert|cast|set|declare|drop|update|md5|benchmark).* [NC,OR]
+    RewriteCond %{QUERY_STRING} ^.*(localhost|loopback|127\.0\.0\.1).* [NC]
+    RewriteRule .* - [F,L]
+</IfModule>
+
+# Limit file upload size for security
+LimitRequestBody 52428800
+
+# Server signature (hide server information)
+ServerSignature Off
+
+# Prevent access to version control directories
+<IfModule mod_rewrite.c>
+    RewriteRule ^(.*/)?\.git+ - [F,L]
+    RewriteRule ^(.*/)?\.svn+ - [F,L]
+    RewriteRule ^(.*/)?\.hg+ - [F,L]
+    RewriteRule ^(.*/)?\.bzr+ - [F,L]
+</IfModule>
+
+# Options
+Options -Indexes -ExecCGI -Includes -MultiViews +SymLinksIfOwnerMatch
+
+# MIME Types (ensure proper handling)
+<IfModule mod_mime.c>
+    AddType application/javascript .js
+    AddType text/css .css
+    AddType application/pdf .pdf
+    AddType application/msword .doc
+    AddType application/vnd.openxmlformats-officedocument.wordprocessingml.document .docx
+    AddType application/vnd.ms-excel .xls
+    AddType application/vnd.openxmlformats-officedocument.spreadsheetml.sheet .xlsx
+</IfModule>
